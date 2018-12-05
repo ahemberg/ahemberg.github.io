@@ -1,1 +1,73 @@
-Hello World
+# Power RPI Zero with lithium batteries
+
+## Background
+I have been looking into powering my raspberry-pis with lithium batteries for quite a while now and looked at different
+ways of achieving this. The most obvious way of doing this would be to buy some 18650 lithium batteries and hook them
+up to the raspberry pi.
+
+This requires voltage regulation to convert the 3.7 volts of the 18650 battery to 5 volts for the rpi. It also
+requires some sort of protection circuitry to make sure that the battery is not discharged too deeply. On top of this
+some solution for charging the battery is also required.
+
+I therefore checked the prices of batteries in my local electronics store. It seemed that I could buy a 2600mAh 18650 cell
+for around 150 SEK (~$15), a boost converter (voltage regulator-circuit) for 100 SEK and an easy to hook up charger-circuit from
+AdaFruit for yet another 100 SEK. The battery included a protection circuit and I could therefore just hook it up via the
+boost converter to the rpi without worrying about discharging the cell too much.
+
+So all in all the grand total for this project would have ended up costing me c.a 350 SEK. That's all hunky dory but couldn't
+we do better? I took a quick look around the store and found a power bank rated 2700 mAh* for 99 SEK and I quickly realized
+that that would solve all my problems. It comes with an included charge and voltage regulation protection circuitry and an included
+boost converter, it even came with a micro-usb cable.
+
+So, the obvious solution to powering your rpi on the go is to just by a power bank, it's cheap, safe and ready to go out of the box.
+
+## Checking out the power bank
+This got me thinking however, the power bank contains all of the separate components that I talked about before:
+a battery, a boost converter, protection and charger circuitry all at a third of the cost of buying the components by themselves.
+Had I found a hole in the matrix? Or was the electronics store just ripping me off with the components? (tldr; yes).
+
+I bought one and took it to bits.
+
+Opening it revieled an 18650 cell of model [cell model] (datasheet can be found here [datasheet of batteries]) that
+can be bought [here for X SEK/DOLLARS]. Pretty neat as we also got a control circuit for almost the same price. The quality
+of this battery is probably not on par with an LG or Samsung cell
+
+The other component inside is a circuit board based on a chip called [X]. This
+is a typical lithium charge controller found in many chinese products. This circuit will take care of all the battery management
+for us, and we don't have to worry about overcharging or deeply discharging the battery. It will also make sure that we get a stable
+5V to the rpi.
+
+[Write about the price of the components separately]
+
+## Modding the circuit board.
+For my RPI-wifi sniffer project [LINK HERE] I would like to be able to have my rpi battery powered in a small box
+and I would therefore like to avoid having USB-cables connecting the different units so I decided to use the power bank
+with some modifications.
+
+The rpi zero can be powered directly from the GPIO 5V pins. It does not have a polyfuse and the 5V pins connect directly
+to the 5V pin of the usb-power socket. I therefore soldered pinheaders to the pi so that it is easy to connect the cables.
+
+[IMAGE OF PI WITH HEADERS AND 5V pin marked]
+
+I now decided to get rid of the USB-socket on the power control board as i find it bulky and I will not be using it
+anyway.
+
+[IMAGES OF DESOLDERING AND IT DESOLDERED]
+
+I leave the micro usb-socket attached so that I can still use it for charging. After the USB socket has been removed
+there are now these bare solder pairs on the circuit board. I attached pin headers to these. I soldered them
+to all four for greater stability, but it is only really necessary to solder to the two outer pads, as these are ground
+and 5V respectively
+
+[IMAGE OF USB Circuit Board with bare pads]
+[IMAGE OF USB PINOUT]
+[IMAGE OF BOARD WITH PINHEADERS]
+
+I can now connect the two circuitboards together with two jumper wires and the RPI boots immediately. The next step
+is to add measure the battery percentage directly from the rpi, more on that in [THIS BLOGPOST]
+
+* I find this a little bit deceptive as this rating is for the battery inside the power bank. That battery is rated
+2700 mAh at 3.7 volts. The power-bank supplies 5 volts however, so the actual rating would be closer to 2000 mAh if we
+assume no losses in the circuitry (which we shouldn't, the efficiency is typically around 80-90%, giving us an effective
+rating of 1600-1800 mAh). I would be much happier if they stated the capacity in Wh instead of mAh, thus getting rid of
+the voltage dependency altogether.
